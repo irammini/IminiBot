@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "🔧 Hosting đã bắt đầu gọi start.sh"
 
 echo "=============================="
 echo "🚀 Khởi động IminiBot (v2.0)"
