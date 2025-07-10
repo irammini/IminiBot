@@ -19,7 +19,7 @@ COGS = [
     "shared.cogs.admin", "shared.cogs.job", "shared.cogs.giftcode",
     "shared.cogs.event", "shared.cogs.social", "shared.cogs.profile",
     "shared.cogs.chaos_game", "shared.cogs.hidden_trigger",
-    "shared.cogs.secret_quest", "shared.cogs.economy", "shared.cogs.profilecard"
+    "shared.cogs.secret_quest", "shared.cogs.economy"
 ]
 
 class BotClient:
