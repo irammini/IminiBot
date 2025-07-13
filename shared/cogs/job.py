@@ -1,6 +1,7 @@
 # cogs/job.py
 
 import random
+import time
 import nextcord
 from nextcord.ext import commands
 
@@ -10,6 +11,8 @@ from shared.models.user import User
 from shared.utils.embed import make_embed
 from shared.utils.decorators import with_achievements
 from shared.utils.achievement import award
+from shared.models.quest import UserQuest
+from sqlalchemy import select
 
 class JobCog(commands.Cog):
     """💼 Job & Work & Skills: setjob, job, work, mastery, skills, upgrade_skill"""
@@ -99,6 +102,8 @@ class JobCog(commands.Cog):
     async def cmd_work(self, ctx: commands.Context):
         user = await self._get_user(ctx.author.id)
         job_meta = JOB_DATA.get(user.job)
+        uid = ctx.author.id
+        now = int(time.time())
 
         if not job_meta:
             return await ctx.send(embed=make_embed(
@@ -144,6 +149,25 @@ class JobCog(commands.Cog):
         msg = f"✅ Bạn làm việc và nhận **{reward}** 🪙"
         if note:
             msg += f"\n{note}"
+
+                # Update daily_work quest progress
+        row = await sess.execute(
+            select(UserQuest).where(
+                UserQuest.user_id == uid,
+                UserQuest.quest_key == "daily_work",
+                UserQuest.period == "daily",
+                UserQuest.completed == False
+            )
+        )
+        uq: UserQuest | None = row.scalar_one_or_none()
+        if uq:
+            uq.progress += 1
+            if uq.progress >= uq.req:
+                uq.completed = True
+                uq.completed_at = now
+            sess.add(uq)
+
+        await sess.commit()
 
         await ctx.send(embed=make_embed(desc=msg, color=nextcord.Color.green()))
 

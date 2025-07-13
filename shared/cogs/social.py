@@ -32,18 +32,21 @@ class SocialCog(commands.Cog):
 
         now = int(time.time())
         async with bot.sessionmaker() as session:
-            giver = await session.get(User, uid) or User(id=uid)
-            if now - (giver.created_at or 0) < 30*24*3600:
-                return await ctx.send(embed=make_embed(
-                    desc="🚫 Acc phải ≥30 ngày mới trust.", color=nextcord.Color.orange()
-                ))
+            giver = await session.get(User, uid)
+            if not giver:
+                giver = User(id=uid, created_at=int(time.time()))
+                session.add(giver)
+                await session.commit()
             exists = await session.get(TrustLog, (uid, member.id))
             if exists:
                 return await ctx.send(embed=make_embed(
                     desc="⚠️ Bạn đã trust người này rồi.", color=nextcord.Color.orange()
                 ))
             session.add(TrustLog(giver_id=uid, receiver_id=member.id, timestamp=now))
-            tgt = await session.get(User, member.id) or User(id=member.id)
+            tgt = await session.get(User, member.id)
+            if not tgt:
+                tgt = User(id=member.id, created_at=int(time.time()))
+                session.add(tgt)
             tgt.trust_points = (tgt.trust_points or 0) + 1
             session.add(tgt)
 

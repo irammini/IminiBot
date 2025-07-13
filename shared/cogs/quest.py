@@ -157,12 +157,12 @@ class QuestCog(commands.Cog):
         """
         uid = ctx.author.id
         periods = ["daily", "weekly"] if not period else [period.lower()]
-        embed = make_embed(title="📜 Your Quests", color=nextcord.Color.teal())
+        embed = make_embed(title="📜 Nhiệm vụ của bạn", color=nextcord.Color.teal())
 
         for p in periods:
             if p not in ("daily", "weekly"):
                 embed_err = make_embed(
-                    desc=f"⚠️ Unknown period '{p}'. Use 'daily' or 'weekly'.",
+                    desc=f"⚠️ Khoảng thời gian '{p}' không hợp lệ. Vui lòng dùng 'daily' hoặc 'weekly'.",
                     color=nextcord.Color.orange()
                 )
                 await ctx.send(embed=embed_err)
@@ -171,33 +171,30 @@ class QuestCog(commands.Cog):
             try:
                 qs = await self._ensure_quests(uid, p)
             except ValueError as ve:
-                # lỗi pool quá ít
                 logger.warning(f"[quest] value error: {ve}")
                 await ctx.send(embed=make_embed(desc=str(ve), color=nextcord.Color.red()))
                 return
             except Exception:
                 logger.exception("[quest] Failed to create or fetch quests")
                 await ctx.send(embed=make_embed(
-                    desc="❌ Lỗi khi tạo quest. Hãy thử lại sau.",
+                    desc="❌ Lỗi khi tạo nhiệm vụ. Vui lòng thử lại sau.",
                     color=nextcord.Color.red()
                 ))
                 return
 
-            # Hiển thị quest
-            title = "🗓️ Daily Quests" if p == "daily" else "📅 Weekly Quests"
+            title = "🗓️ Nhiệm vụ hàng ngày" if p == "daily" else "📅 Nhiệm vụ hàng tuần"
             pool  = DAILY_POOL if p == "daily" else WEEKLY_POOL
             lines = []
             for uq in qs:
-                status = "✅" if uq.completed else f"{uq.progress}/{uq.req}"
-                # tìm text dựa trên quest_key
+                status = "✅ Hoàn thành" if uq.completed else f"{uq.progress}/{uq.req}"
                 text = next((q["text"] for q in pool if q["key"] == uq.quest_key), uq.quest_key)
                 lines.append(f"`{uq.quest_key}` {text} — **{status}**")
 
             expires_str = datetime.datetime.utcfromtimestamp(qs[0].expires_at)\
                                .strftime("%Y-%m-%d %H:%M UTC")
             embed.add_field(
-                name=f"{title} (expires: {expires_str})",
-                value="\n".join(lines) if lines else "Không có quest.",
+                name=f"{title} (hết hạn: {expires_str})",
+                value="\n".join(lines) if lines else "Không có nhiệm vụ.",
                 inline=False
             )
 
@@ -228,12 +225,12 @@ class QuestCog(commands.Cog):
 
             if not uq:
                 return await ctx.send(embed=make_embed(
-                    desc="❌ Quest không tồn tại hoặc đã hết hạn.",
+                    desc="❌ Nhiệm vụ không tồn tại hoặc đã hết hạn.",
                     color=nextcord.Color.red()
                 ))
             if uq.completed:
                 return await ctx.send(embed=make_embed(
-                    desc="⚠️ Quest đã hoàn thành.",
+                    desc="⚠️ Nhiệm vụ đã hoàn thành.",
                     color=nextcord.Color.orange()
                 ))
             if uq.progress < uq.req:
