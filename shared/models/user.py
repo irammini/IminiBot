@@ -1,7 +1,7 @@
 # models/user.py
 import time
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy import Column, Text, BigInteger, Integer, Float, String, Boolean, ARRAY, VARCHAR, JSON
+from sqlalchemy import Column, Text, BigInteger, Integer, Float, String, Boolean, ARRAY, VARCHAR, JSON, DECIMAL
 from shared.db import Base
 
 
@@ -11,7 +11,7 @@ class User(Base):
     xp = Column(BigInteger, default=0)
     level = Column(BigInteger, nullable=False, default=1)
     voice_time = Column(Float, default=0)
-    wallet = Column(BigInteger, default=0)
+    wallet = Column(DECIMAL(38, 0), default=0)
     bank_balance = Column(BigInteger, default=0)
     bank_limit = Column(BigInteger, default=1_000_000_000)
     debt = Column(BigInteger, default=0)

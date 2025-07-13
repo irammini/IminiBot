@@ -63,7 +63,8 @@ ach_triggers.register("echo", "secretcmd1")
 ach_triggers.register("unlock", "hidden_trigger")
 
 # Level / XP / Misc
-ach_triggers.register("adminboost", "adminboost", "adminreset")
+ach_triggers.register("addcoin", "adminboost")
+ach_triggers.register("resetcoin", "adminreset")
 ach_triggers.register("levelup", "lv5", "lv10", "lv25", "lv50")
 ach_triggers.register("voice", "voice1h")
 

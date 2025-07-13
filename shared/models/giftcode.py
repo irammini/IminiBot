@@ -14,6 +14,7 @@ class GiftCode(Base):
     per_user_cooldown = Column(Integer, default=60)
     creator_id = Column(BigInteger)
     enabled = Column(Boolean, default=True)
+    allowed_user_ids = Column(ARRAY(BigInteger), nullable=True)
 
 class UserGiftCode(Base):
     __tablename__ = "user_giftcodes"

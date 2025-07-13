@@ -5,6 +5,7 @@ from sqlalchemy import select
 from shared.db import AsyncSession
 from shared.models.social import TrustLog, ThankLog
 from shared.models.user import User
+from shared.models.quest import UserQuest
 from shared.utils.embed import make_embed
 from shared.utils.decorators import with_achievements
 
@@ -45,44 +46,46 @@ class SocialCog(commands.Cog):
             tgt = await session.get(User, member.id) or User(id=member.id)
             tgt.trust_points = (tgt.trust_points or 0) + 1
             session.add(tgt)
+
+            # Update daily_trust quest progress
+            row = await session.execute(
+                select(UserQuest).where(
+                    UserQuest.user_id == uid,
+                    UserQuest.quest_key == "daily_trust",
+                    UserQuest.period == "daily",
+                    UserQuest.completed == False
+                )
+            )
+            uq: UserQuest | None = row.scalar_one_or_none()
+            if uq:
+                uq.progress += 1
+                if uq.progress >= uq.req:
+                    uq.completed = True
+                    uq.completed_at = now
+                session.add(uq)
+
             await session.commit()
 
         await ctx.send(embed=make_embed(
             desc=f"✅ Bạn đã trust {member.mention}", color=nextcord.Color.green()
         ))
 
-    @commands.command(name="thank")
-    @with_achievements("thank")
-    async def cmd_thank(self, ctx: commands.Context, member: nextcord.Member):
-        bot = self.bot
-        """🙏 !thank <user> — gửi lời cảm ơn, +1 karma."""
-        uid = ctx.author.id
-        if member.id == uid:
-            return await ctx.send(embed=make_embed(
-                desc="❌ Không thể tự thank.", color=nextcord.Color.red()
-            ))
-
-        now = int(time.time())
-        async with bot.sessionmaker() as session:
-            exists = await session.get(ThankLog, (uid, member.id))
-            if exists:
-                return await ctx.send(embed=make_embed(
-                    desc="⚠️ Bạn đã thank rồi.", color=nextcord.Color.orange()
-                ))
-            session.add(ThankLog(sender_id=uid, receiver_id=member.id, timestamp=now))
-            tgt = await session.get(User, member.id) or User(id=member.id)
-            tgt.karma = (tgt.karma or 0) + 1
-            session.add(tgt)
-            await session.commit()
-
-        await ctx.send(embed=make_embed(
-            desc=f"🙏 Bạn đã thank {member.mention}", color=nextcord.Color.green()
-        ))
-
     @commands.command(name="shoutout")
     @with_achievements("shoutout")
     async def cmd_shoutout(self, ctx: commands.Context, channel: nextcord.TextChannel, *, msg: str):
-        """📣 !shoutout <#channel> <message> — quảng bá."""
+        """📣 !shoutout <#channel> <message> — quảng bá (yêu cầu level 50)."""
+        bot = self.bot
+        uid = ctx.author.id
+
+        # Kiểm tra level
+        async with bot.sessionmaker() as session:
+            user = await session.get(User, uid) or User(id=uid)
+            if (user.level or 1) < 50:
+                return await ctx.send(embed=make_embed(
+                    desc="🚫 Bạn cần đạt **level 50** mới được sử dụng lệnh này.",
+                    color=nextcord.Color.red()
+                ))
+
         await channel.send(embed=make_embed(
             title="📣 Shoutout!", desc=f"{ctx.author.mention} nói:\n> {msg}", color=nextcord.Color.orange()
         ))

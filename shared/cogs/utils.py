@@ -77,52 +77,52 @@ class UtilsCog(commands.Cog):
     # ---------- Help command ----------
     @commands.command(name="bothelp")
     async def bothelp(self, ctx: commands.Context):
-        """📖 Hiển thị danh sách lệnh & hướng dẫn bản pre-3.8"""
+        """📖 Hiển thị danh sách lệnh & hướng dẫn"""
         pages: list[nextcord.Embed] = []
 
         # Page 1: Command list
         e1 = make_embed(title="📖 IminiBot Help (v3.7)", color=nextcord.Color.teal())
         e1.add_field(name="💼 Job & Skills",
-                    value="`!setjob`, `!job`, `!work`, `!skills`, `!upgrade_skill`",
+                    value="`i!setjob`, `i!job`, `i!work`, `i!skills`, `i!upgrade_skill`",
                     inline=False)
         e1.add_field(name="🎮 Minigame",
-                    value="`!oneshot`, `!inverseguess`, `!burncoin`, `!spill`",
+                    value="`i!oneshot`, `i!inverseguess`, `i!burncoin`, `i!spill`",
                     inline=False)
         e1.add_field(name="🧠 Quiz",
-                    value="`!quiz`, `!speedrunquiz`",
+                    value="`i!quiz`, `i!speedrunquiz`",
                     inline=False)
         e1.add_field(name="💰 Economy",
-                    value="`!daily`, `!coinflip`, `!beg`, `!crime`, `!give`, `!pray`, `!repay`, `!deposit`, `!withdraw`",
+                    value="`i!daily`, `i!coinflip`, `i!beg`, `i!crime`, `i!give`, `i!pray`, `i!repay`, `i!deposit`, `i!withdraw`",
                     inline=False)
         e1.add_field(name="🛍️ Shop & Items",
-                    value="`!shop`, `!sell`, `!fish`, `!trash`, `!inventory`, `!use`",
+                    value="`i!shop`, `i!sell`, `i!fish`, `i!trash`, `i!inventory`, `i!use`",
                     inline=False)
-        e1.add_field(name="📜 Quest & Event",
-                    value="`!quest`, `!complete`, `!event`, `!joinevent`, `!claim_event`",
+        e1.add_field(name="📜 Quest & Giftcode",
+                    value="`i!quest`, `i!complete`, `i!mygiftcode`, `i!redeemcode`",
                     inline=False)
         e1.add_field(name="🎖️ Achievement",
-                    value="`!achievements`, `!achievementkeys`",
+                    value="`i!achievements`, `i!achievementkeys`",
                     inline=False)
         e1.add_field(name="👤 Profile & Social",
-                    value="`!profile`, `!trust`, `!setflex`, `!unsetflex`, `!shoutout`",
+                    value="`i!profile`, `i!trust`, `i!setflex`, `i!unsetflex`, `i!shoutout`",
                     inline=False)
         e1.add_field(name="🧪 BETA Features",
-                    value="`!previewcard`, `!cardstyle`, `!setframe`, `!setcolor`, `!settheme`, `Còn nữa...`",
+                    value="`i!previewcard`, `i!cardstyle`, `i!setframe`, `i!setcolor`, `i!settheme`, `Còn nữa...`",
                     inline=False)
         pages.append(e1)
 
         # Page 2: Quiz guide
         quiz_desc = (
-            "**🎮 Cách chơi Quiz (BETA):**\n"
-            "Dùng `!quiz`, chọn độ khó qua emoji, trả lời 5 câu bằng cách gõ số (1–4).\n\n"
-            "**📈 Độ khó & Unlock:**\n"
-            "💚 Easy → mặc định mở\n"
-            "🟡 Normal → cần ≥3 câu đúng Easy\n"
-            "🔴 Hard → cần ≥5 câu đúng Normal\n"
-            "🔥 Extreme → cần ≥5 câu đúng Hard\n"
-            "💀 Nightmare → cần ≥3 câu đúng Extreme\n\n"
-            "**⏱️ Speedrun:** `!speedrunquiz` để chơi Easy liên tục, ghi streak cao.\n"
-            "**🏅 Badge:** Mỗi cấp quiz có badge tương ứng khi hoàn thành đủ lần."
+            "**🎮 Cách chơi Quiz:**\n"
+            "Dùng `i!quiz`, chọn độ khó bằng emoji, trả lời 5 câu hỏi bằng cách gõ số (1–4).\n\n"
+            "**📈 Mở khóa độ khó:**\n"
+            "🟢 Easy: mặc định mở\n"
+            "🔵 Normal: thắng 10 lần Easy\n"
+            "🔴 Hard: thắng 50 lần Normal\n"
+            "⚫ Extreme: thắng 500 lần Hard\n"
+            "❗ Nightmare: thắng 1000 lần Extreme\n\n"
+            "**⏱️ Speedrun:** Dùng `i!speedrunquiz` để chơi Easy liên tục, ghi streak cao nhất.\n"
+            "**🏅 Thành tích:** Mỗi cấp quiz có badge riêng khi hoàn thành đủ số lần thắng."
         )
         e2 = make_embed(title="📘 Hướng dẫn Quiz", desc=quiz_desc, color=nextcord.Color.blue())
         pages.append(e2)

@@ -88,21 +88,20 @@ ACH_LIST = [
     ("leader_cash",       "💎 Cash King",           "Top 5 Wallet",                             False),
 
     # Mastery Job Achievements
-    ("master_cn", "🧱 Người Thợ Vững Vàng", "Chinh phục mọi công trình với sự bền bỉ và kiên trì", True),
-    ("master_cn_manager", "🏭 Người Lãnh Đạo Nhà Máy", "Dẫn dắt công nhân vượt qua mọi thử thách sản xuất", True),
-    ("master_os", "🧑‍💻 Chiến Binh Văn Phòng", "Vượt qua deadline và áp lực với phong thái chuyên nghiệp", True),
-    ("master_os_manager", "📈 Nhà Quản Lý Tài Ba", "Điều phối văn phòng như một bậc thầy chiến lược", True),
-    ("master_cc", "🎨 Nghệ Sĩ Sáng Tạo", "Biến ý tưởng thành kiệt tác truyền cảm hứng", True),
-    ("master_cd", "🧑‍✈️ Người Thuyền Trưởng Công Ty", "Dẫn dắt công ty đến bến bờ thành công", True),
-    ("master_ux_designer", "🎨 Bậc Thầy Trải Nghiệm Người Dùng", "Thiết kế trải nghiệm mượt mà và cuốn hút", True),
-    ("master_content_writer", "📝 Nhà Văn Tài Ba", "Chắp bút tạo nên những câu chuyện sống động", True),
-    ("master_gamer", "🎮 Vua Game Thủ", "Chinh phục mọi thử thách trong thế giới ảo", True),
-    ("master_streamer", "📹 Ngôi Sao Streaming", "Thu hút hàng ngàn người xem với phong cách riêng", True),
-    ("master_engineer", "💻 Phù Thủy Mã Nguồn", "Biến ý tưởng thành dòng code hoàn hảo", True),
-    ("master_mechanic", "🔧 Bậc Thầy Cơ Khí", "Sửa chữa và tối ưu mọi thiết bị một cách tinh tế", True),
-    ("master_data_analyst", "📊 Nhà Phân Tích Xuất Sắc", "Khai phá dữ liệu để tìm ra những bí mật ẩn giấu", True),
-    ("master_network_admin", "🌐 Người Giữ Mạng", "Bảo vệ và duy trì hệ thống mạng ổn định", True),
-    ("master_project_manager", "🗂️ Bậc Thầy Quản Lý Dự Án", "Điều phối dự án với sự chính xác và hiệu quả", True),
-    ("master_product_owner", "🛠️ Người Chủ Sản Phẩm Tài Ba", "Định hướng sản phẩm với tầm nhìn chiến lược", True)
+    ("master_cn", "🧱 Bậc Thầy Công Nhân", "Hoàn thành thành thạo nghề Công nhân", False),
+    ("master_cn_manager", "🏭 Bậc Thầy Quản Lý Công Nhân", "Hoàn thành thành thạo nghề Quản lý công nhân", False),
+    ("master_os", "🧑‍💻 Bậc Thầy Nhân Viên Văn Phòng", "Hoàn thành thành thạo nghề Nhân viên văn phòng", False),
+    ("master_os_manager", "📈 Bậc Thầy Quản Lý Văn Phòng", "Hoàn thành thành thạo nghề Quản lý văn phòng", False),
+    ("master_cc", "🎨 Bậc Thầy Nhà Sáng Tạo Nội Dung", "Hoàn thành thành thạo nghề Nhà sáng tạo nội dung", False),
+    ("master_cd", "🧑‍✈️ Bậc Thầy Giám Đốc Công Ty", "Hoàn thành thành thạo nghề Giám đốc công ty", False),
+    ("master_ux_designer", "🎨 Bậc Thầy Thiết Kế Trải Nghiệm", "Hoàn thành thành thạo nghề Thiết kế trải nghiệm", False),
+    ("master_content_writer", "📝 Bậc Thầy Biên Tập Nội Dung", "Hoàn thành thành thạo nghề Biên tập nội dung", False),
+    ("master_gamer", "🎮 Bậc Thầy Game Thủ Chuyên Nghiệp", "Hoàn thành thành thạo nghề Game thủ chuyên nghiệp", False),
+    ("master_streamer", "📹 Bậc Thầy Streamer Tâm Huyết", "Hoàn thành thành thạo nghề Streamer tâm huyết", False),
+    ("master_engineer", "💻 Bậc Thầy Kỹ Sư", "Hoàn thành thành thạo nghề Kỹ sư", False),
+    ("master_mechanic", "🔧 Bậc Thầy Thợ Máy", "Hoàn thành thành thạo nghề Thợ máy", False),
+    ("master_data_analyst", "📊 Bậc Thầy Chuyên Viên Phân Tích Dữ Liệu", "Hoàn thành thành thạo nghề Chuyên viên phân tích dữ liệu", False),
+    ("master_network_admin", "🌐 Bậc Thầy Quản Trị Mạng", "Hoàn thành thành thạo nghề Quản trị mạng", False),
+    ("master_project_manager", "🗂️ Bậc Thầy Quản Lý Dự Án", "Hoàn thành thành thạo nghề Quản lý dự án", False),
+    ("master_product_owner", "🛠️ Bậc Thầy Chủ Nhiệm Sản Phẩm", "Hoàn thành thành thạo nghề Chủ nhiệm sản phẩm", False)
 ]
-

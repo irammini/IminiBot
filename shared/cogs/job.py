@@ -130,6 +130,11 @@ class JobCog(commands.Cog):
             user.job_tokens = (user.job_tokens or 0) + 1
             note_lines.append("🎟️ +1 Job Token")
 
+        # Award badge nếu mastery đạt 100
+        if user.mastery == 100 and user.job:
+            badge_key = f"master_{user.job}"
+            await award(self.bot, ctx.author.id, badge_key)
+
         # Lưu lại
         async with self.bot.sessionmaker() as sess:
             sess.add(user)

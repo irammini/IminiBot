@@ -30,6 +30,30 @@ class QuestCog(commands.Cog):
     async def track_command_spam(self, ctx):
         print(f"🔥 Lệnh vừa được gọi: {ctx.command}")
 
+    @commands.Cog.listener()
+    async def on_message(self, message: nextcord.Message):
+        if message.author.bot:
+            return
+        uid = message.author.id
+        async with self.bot.sessionmaker() as session:
+            # Lấy quest daily_chat chưa hoàn thành
+            row = await session.execute(
+                select(UserQuest).where(
+                    UserQuest.user_id == uid,
+                    UserQuest.quest_key == "daily_chat",
+                    UserQuest.period == "daily",
+                    UserQuest.completed == False
+                )
+            )
+            uq: UserQuest | None = row.scalar_one_or_none()
+            if uq:
+                uq.progress += 1
+                if uq.progress >= uq.req:
+                    uq.completed = True
+                    uq.completed_at = int(time.time())
+                session.add(uq)
+                await session.commit()
+
     def _today_midnight(self) -> datetime.datetime:
         now = datetime.datetime.utcnow()
         return datetime.datetime(now.year, now.month, now.day)

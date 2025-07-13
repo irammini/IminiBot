@@ -77,13 +77,13 @@ class ShopCog(commands.Cog):
 
         async with self.bot.sessionmaker() as sess:
             rows = await sess.execute(select(ShopItem).where(ShopItem.featured))
-            items = rows.scalars().all()
+            shop_items = rows.scalars().all()
 
-        if not items:
+        if not shop_items:
             return await ctx.send(embed=make_embed(desc="🛒 Shop hôm nay trống.", color=nextcord.Color.orange()))
 
         eb = make_embed(title="🛍️ Shop Hôm Nay", color=nextcord.Color.green())
-        for it in items:
+        for it in shop_items:
             emoji = it.emoji or ""
             name_display = f"{emoji} {it.name}" if emoji else it.name
             stock = f" (còn {it.stock})" if it.stock is not None else ""

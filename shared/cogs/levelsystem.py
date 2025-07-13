@@ -132,6 +132,36 @@ class LevelSystemCog(commands.Cog):
             if role:
                 await member.add_roles(role)
 
+    async def _handle_voice_milestone(self, member: nextcord.Member, voice_time: float):
+        """Xử lý milestone voice time, thông báo và gán role nếu cần"""
+        milestones = {
+            10: "Voice Chatter I",
+            50: "Voice Chatter II",
+            100: "Voice Chatter III",
+            200: "Voice Chatter IV",
+            500: "Voice Chatter V"
+        }
+        ch = self.bot.get_channel(self.bot.config.get("levelup_channel", LEVEL_UP_CHANNEL_ID))
+        for milestone, role_name in milestones.items():
+            # Kiểm tra nếu voice_time vừa đạt milestone (ví dụ: từ dưới milestone lên >= milestone)
+            # Để tránh spam, ta cần kiểm tra user đã có role chưa
+            if voice_time >= milestone:
+                role = nextcord.utils.get(member.guild.roles, name=role_name)
+                if role and role not in member.roles:
+                    try:
+                        await member.add_roles(role)
+                        if ch:
+                            embed = make_embed(
+                                title="🎤 Voice Milestone!",
+                                desc=f"{member.mention} đã đạt mốc **{milestone} giờ** trong voice và được nhận role **{role_name}**!",
+                                color=nextcord.Color.blue(),
+                                timestamp=datetime.datetime.utcnow()
+                            )
+                            await ch.send(embed=embed)
+                    except Exception as e:
+                        logger.error(f"Lỗi khi gán role milestone voice: {e}")
+                    break
+
     @commands.command(name="setflex")
     async def set_flex(self, ctx: commands.Context, ach_key: str):
         bot = self.bot

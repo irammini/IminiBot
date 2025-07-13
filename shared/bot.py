@@ -11,7 +11,7 @@ from nextcord.ext import commands
 
 from shared.db import init_engine, Base
 from shared.utils.embed import make_embed
-from shared.data.seed_items import seed_items
+from shared.data.seed_items import seed_items, seed_shop_items
 
 COGS = [
     "shared.cogs.utils", "shared.cogs.levelsystem", "shared.cogs.achievement", "shared.cogs.minigame",
@@ -94,6 +94,7 @@ class BotClient:
         async def on_ready():
             logger.info(f"✅ Logged in as {self.bot.user} (ID: {self.bot.user.id})")
             await seed_items(bot.sessionmaker)
+            await seed_shop_items(bot.sessionmaker)
 
         @self.bot.event
         async def on_message(message: nextcord.Message):

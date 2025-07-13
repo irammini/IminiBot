@@ -136,13 +136,5 @@ class AchievementCog(commands.Cog):
             color=nextcord.Color.teal()
         ))
 
-    @commands.command(name="unlock")
-    async def manual_unlock(self, ctx: commands.Context, key: str):
-        """🔓 Dev-only: unlock badge cho tester."""
-        ok = await award(self.bot, ctx.author.id, key)
-        if not ok:
-            return await ctx.send(embed=make_embed(desc=f"Không unlock được `{key}`.", color=nextcord.Color.red()))
-        await ctx.send(embed=make_embed(desc=f"✅ Đã unlock `{key}`!", color=nextcord.Color.green()))
-
 def setup(bot: commands.Bot):
     bot.add_cog(AchievementCog(bot))

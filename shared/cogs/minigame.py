@@ -14,6 +14,7 @@ from shared.models.trivia import TriviaQuestion
 from shared.data.trivia_pool import TRIVIA_POOL
 from shared.utils.embed import make_embed
 from shared.utils.achievement import award
+from shared.models.quest import UserQuest
 
 # độ khó quiz ↔ emoji
 EMOJI_LEVEL = {
@@ -86,6 +87,25 @@ class MinigameCog(commands.Cog):
                         color=nextcord.Color.dark_grey()
                     ))
 
+    async def update_quest_progress(self, session: AsyncSession, uid: int, keys: list[str], period="daily", amount=1):
+        for key in keys:
+            row = await session.execute(
+                select(UserQuest).where(
+                    UserQuest.user_id == uid,
+                    UserQuest.quest_key == key,
+                    UserQuest.period == period,
+                    UserQuest.completed == False
+                )
+            )
+            uq: UserQuest | None = row.scalar_one_or_none()
+            if uq:
+                uq.progress += amount
+                if uq.progress >= uq.req:
+                    uq.completed = True
+                    uq.completed_at = time.time()
+                session.add(uq)
+        await session.commit()
+
     async def _get_user(self, uid: int) -> User:
         async with self.bot.sessionmaker() as sess:
             user = await sess.get(User, uid)
@@ -106,6 +126,8 @@ class MinigameCog(commands.Cog):
         """🎯 !guess [low] [high] — đoán số, có xác suất funni-guess."""
         low = max(1, low)
         high = min(high, 1_000_000_000)
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
         if low >= high:
             return await ctx.send(embed=make_embed(
                 desc="⚠️ Khoảng đoán không hợp lệ.",
@@ -157,11 +179,13 @@ class MinigameCog(commands.Cog):
                 desc=f"😢 Sai rồi. {reveal}",
                 color=nextcord.Color.orange()
             ))
-        
+
     @commands.command(name="inverseguess")
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def cmd_inverseguess(self, ctx: commands.Context, number: int):
         """🃏 !inverseguess <số> — để bot đoán ngược bạn! Nếu trùng → bạn nhận thưởng."""
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
         if not 1 <= number <= 100:
             return await ctx.send(embed=make_embed(
                 desc="⚠️ Số phải nằm trong khoảng 1–100.",
@@ -243,6 +267,8 @@ class MinigameCog(commands.Cog):
                 desc="❌ Số tiền không hợp lệ hoặc không đủ để đốt.",
                 color=nextcord.Color.red()
             ))
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         user.wallet -= amount
         await self._save_user(user)
@@ -268,6 +294,8 @@ class MinigameCog(commands.Cog):
         ]
 
         result = random.choice(spill_pool)
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         if result:
             # thưởng nhẹ nếu là item
@@ -300,6 +328,8 @@ class MinigameCog(commands.Cog):
                 desc="❌ Chọn head hoặc tail.",
                 color=nextcord.Color.red()
             ))
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         flip = random.choice(("head", "tail"))
         user = await self._get_user(ctx.author.id)
@@ -326,6 +356,8 @@ class MinigameCog(commands.Cog):
                 desc="❌ Chọn rock/paper/scissors.",
                 color=nextcord.Color.red()
             ))
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         bot_choice = random.choice(list(icons))
         user = await self._get_user(ctx.author.id)
@@ -347,6 +379,8 @@ class MinigameCog(commands.Cog):
     async def cmd_quiz(self, ctx: commands.Context):
         """❓ !quiz — làm 5 câu hỏi tùy độ khó."""
         user = await self._get_user(ctx.author.id)
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         # hiển thị menu chọn độ khó
         desc = ""
@@ -416,6 +450,8 @@ class MinigameCog(commands.Cog):
         pool = [q for q in TRIVIA_POOL if q["level"] == "easy"]
         if len(pool) < rounds:
             return await ctx.send(embed=make_embed(desc="⚠️ Không đủ câu easy.", color=nextcord.Color.orange()))
+        async with self.bot.sessionmaker() as session:
+            await self.update_quest_progress(session, ctx.author.id, ["daily_minigame", "week_minigame"])
 
         streak = 0
         for i, q in enumerate(random.sample(pool, rounds), start=1):

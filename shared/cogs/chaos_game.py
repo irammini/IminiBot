@@ -18,108 +18,44 @@ TASKS = [
 ]
 
 class ChaosGameCog(commands.Cog):
-    """
-    🎲 Chaos Game:  
-      - !chaos : Bot chọn 1 thử thách ngẫu nhiên, hoàn thành trong thời gian giới hạn.
-      - on_message/on_reaction_add : Đếm tiến độ, kết thúc kiểm tra.
-    """
+    """🎲 Chaos Game"""
 
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot):
         self.bot = bot
-        # active[user_id] = {"task": TASK, "count": int, "end": timestamp, "msg": Message}
-        self.active: dict[int, dict] = {}
-
-    @commands.Cog.listener()
-    async def track_command_spam(self, ctx):
-        print(f"🔥 Lệnh vừa được gọi: {ctx.command}")
+        self.active_challenges = {}  # {user_id: {"type": str, "progress": int, "goal": int}}
 
     @commands.command(name="chaos")
-    async def chaos(self, ctx: commands.Context):
-        bot = self.bot
-        """🎲 !chaos — Nhận Challenge ngẫu nhiên."""
-        user_id = ctx.author.id
-        if user_id in self.active:
-            return await ctx.send(embed=make_embed(
-                "⚠️ Bạn đang có thử thách đang chạy.", nextcord.Color.orange()
-            ))
-
-        task = random.choice(TASKS)
-        desc = f"{task['text']}\nHoàn thành trước khi hết **{task['duration']}s**!"
-        embed = make_embed(title="🎲 Chaos Challenge", desc=desc, color=nextcord.Color.dark_red())
-        m = await ctx.send(embed=embed)
-
-        # Khởi tạo tiến độ
-        self.active[user_id] = {
-            "task": task,
-            "count": 0,
-            "end": time.time() + task["duration"],
-            "msg": m
-        }
-
-        # Chờ hết thời gian
-        await asyncio.sleep(task["duration"])
-        info = self.active.pop(user_id, None)
-        if not info:
-            return
-
-        # Kết quả
-        if info["count"] >= task["count"]:
-            reward = 50
-            async with bot.sessionmaker() as session:
-                u = await session.get(User, user_id)
-                u.wallet = (u.wallet or 0) + reward
-                session.add(u)
-                await session.commit()
-            await ctx.send(embed=make_embed(
-                f"🎉 Thử thách hoàn thành! Bạn nhận +{reward} 🪙",
-                color=0x57F287
-            ))
-        else:
-            await ctx.send(embed=make_embed(
-                f"😢 Thất bại! Bạn chỉ hoàn thành {info['count']}/{task['count']}.",
-                color=0xE74C3C
-            ))
+    @commands.cooldown(1, 30, commands.BucketType.user)
+    async def cmd_chaos(self, ctx):
+        """Bắt đầu thử thách Chaos (random)"""
+        if ctx.author.id in self.active_challenges:
+            return await ctx.send(embed=make_embed(desc="Bạn đang có thử thách Chaos chưa hoàn thành!", color=nextcord.Color.orange()))
+        import random
+        challenge_type = random.choice(["message", "emoji", "reaction"])
+        goal = random.randint(3, 7)
+        self.active_challenges[ctx.author.id] = {"type": challenge_type, "progress": 0, "goal": goal}
+        await ctx.send(embed=make_embed(desc=f"Thử thách: gửi {goal} {challenge_type} liên tiếp!", color=nextcord.Color.blue()))
 
     @commands.Cog.listener()
-    async def on_message(self, message: nextcord.Message):
-        """Đếm task command hoặc emoji."""
+    async def on_message(self, message):
         if message.author.bot:
             return
-        user_id = message.author.id
-        info = self.active.get(user_id)
-        if not info:
-            return
+        challenge = self.active_challenges.get(message.author.id)
+        if challenge and challenge["type"] == "message":
+            challenge["progress"] += 1
+            if challenge["progress"] >= challenge["goal"]:
+                await self._complete_challenge(message.author, message.channel)
 
-        now = time.time()
-        if now > info["end"]:
-            return
-
-        task = info["task"]
-        # Nếu task yêu cầu command
-        if "command" in task:
-            if message.content.strip().lower().startswith(f"!{task['command']}"):
-                info["count"] += 1
-
-        # Nếu task yêu cầu emoji trong nội dung tin nhắn
-        if "emoji" in task:
-            info["count"] += message.content.count(task["emoji"])
-
-    @commands.Cog.listener()
-    async def on_reaction_add(self, reaction: nextcord.Reaction, user: nextcord.User):
-        """Đếm task reaction."""
-        if user.bot:
-            return
-        info = self.active.get(user.id)
-        if not info:
-            return
-
-        now = time.time()
-        if now > info["end"]:
-            return
-
-        task = info["task"]
-        if "react" in task and str(reaction.emoji) == task["react"]:
-            info["count"] += 1
+    async def _complete_challenge(self, user, channel):
+        async with self.bot.sessionmaker() as sess:
+            db_user = await sess.get(User, user.id)
+            if not db_user:
+                db_user = User(id=user.id)
+                sess.add(db_user)
+            db_user.wallet += 500
+            await sess.commit()
+        self.active_challenges.pop(user.id, None)
+        await channel.send(embed=make_embed(desc=f"🎉 {user.mention} đã hoàn thành thử thách Chaos và nhận 500 xu!", color=nextcord.Color.green()))
 
 def setup(bot: commands.Bot):
     bot.add_cog(ChaosGameCog(bot))
