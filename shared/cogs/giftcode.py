@@ -18,7 +18,7 @@ from shared.utils.embed import make_embed
 class GiftCodeCog(commands.Cog):
     """🎁 GiftCode: creategift (dev), redeemcode, mygiftcode."""
 
-    DEV_IDS = [1064509322228412416, 1327287076122787940]
+    DEV_IDS = [1064509322228412416, 1327287076122787940, 1204490429727244301]
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot

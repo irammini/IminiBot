@@ -81,7 +81,7 @@ class UtilsCog(commands.Cog):
         pages: list[nextcord.Embed] = []
 
         # Page 1: Command list
-        e1 = make_embed(title="📖 IminiBot Help (v3.7)", color=nextcord.Color.teal())
+        e1 = make_embed(title="📖 IminiBot Help (v3.8)", color=nextcord.Color.teal())
         e1.add_field(name="💼 Job & Skills",
                     value="`i!setjob`, `i!job`, `i!work`, `i!skills`, `i!upgrade_skill`",
                     inline=False)
@@ -158,7 +158,7 @@ class UtilsCog(commands.Cog):
         uptime = datetime.datetime.now(datetime.timezone.utc) - self.start_time
         embed = make_embed(title="ℹ️ IminiBot Info", color=nextcord.Color.dark_blue())
         embed.add_field(name="📦 Version",
-                        value=self.bot.config.get("version", "pre-3.8"),
+                        value=self.bot.config.get("version", "3.8"),
                         inline=True)
         embed.add_field(name="⏱️ Uptime",
                         value=str(uptime).split('.')[0],
@@ -248,7 +248,7 @@ class UtilsCog(commands.Cog):
         }
         if category not in METRICS:
             return await ctx.send(embed=make_embed(
-                desc="❌ Metric không hợp lệ.", color=nextcord.Color.red()
+                desc="❌ Metric không hợp lệ, các metric có sẵn là cash, level, voicetime và streak.", color=nextcord.Color.red()
             ), delete_after=5)
 
         col, label = METRICS[category]

@@ -21,7 +21,6 @@ TREASURE_ITEMS = [
 ]
 
 # Danh sách item chính
-# Format: (id, display_name, description, rarity, category, [price])
 ITEMS = [
     # 🎉 Sự kiện đặc biệt
     {
@@ -71,39 +70,50 @@ ITEMS = [
 
     # 🎨 Profile trang trí
     {
-        "key": "profile_ribbon",
-        "name": "Profile Ribbon",
-        "price": 750,
-        "emoji": "🎀",
-        "limit": 1
+        "key": "custom_avatar",
+        "name": "Custom Avatar",
+        "price": 250000,
+        "emoji": "🖼️",
+        "limit": 1,
+        "category": "style"
+    },
+    {
+        "key": "profile_banner",
+        "name": "Profile Banner",
+        "price": 250000,
+        "emoji": "�",
+        "limit": 1,
+        "category": "style"
+    },
+    {
+        "key": "custom_field",
+        "name": "Custom Field",
+        "price": 1000000,
+        "emoji": "📝",
+        "limit": 1,
+        "category": "style"
     },
     {
         "key": "profile_emoji",
         "name": "Profile Emoji",
         "price": 850,
         "emoji": "😎",
-        "limit": 1
+        "limit": 1,
+        "category": "style"
     },
     {
         "key": "color_accent",
         "name": "Color Accent",
         "price": 1800,
         "emoji": "🎨",
-        "limit": 1
-    },
-        {
-        "key": "title_customizer",
-        "name": "Custom Title",
-        "price": 1200,
-        "emoji": "🏆",
         "limit": 1,
         "category": "style"
     },
     {
-        "key": "profile_theme",
-        "name": "Profile Theme",
-        "price": 1600,
-        "emoji": "🎭",
+        "key": "title_customizer",
+        "name": "Custom Title",
+        "price": 1200,
+        "emoji": "🏆",
         "limit": 1,
         "category": "style"
     },
