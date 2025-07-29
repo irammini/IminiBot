@@ -20,6 +20,68 @@ from shared.utils.embed import make_embed
 logger = logging.getLogger(__name__)
 LEVEL_UP_CHANNEL_ID = 0
 
+# --- View for ID Agreement ---
+class IDAgreementView(nextcord.ui.View):
+    def __init__(self, bot, author: nextcord.Member):
+        super().__init__(timeout=300) # 5 phút để quyết định
+        self.bot = bot
+        self.author = author
+        self.decision = None
+
+    async def _update_user(self, uid: int, **fields):
+        async with self.bot.sessionmaker() as session:
+            await session.execute(update(User).where(User.id == uid).values(**fields))
+            await session.commit()
+
+    @nextcord.ui.button(label="Đồng ý", style=nextcord.ButtonStyle.success)
+    async def agree(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message("Bạn không phải người yêu cầu.", ephemeral=True)
+
+        async with self.bot.sessionmaker() as session:
+            # Tạo ID duy nhất theo format IM-XXXX
+            while True:
+                new_id = f"IM-{random.randint(1000, 9999)}"
+                existing = await session.scalar(select(User.id).where(User.imini_id == new_id))
+                if not existing:
+                    break
+            
+            await self._update_user(self.author.id, imini_id=new_id)
+
+        embed = make_embed(
+            title="✅ Đăng ký thành công!",
+            desc=f"Chào mừng bạn đến với hệ thống Imini ID. ID của bạn là: `{new_id}`",
+            color=nextcord.Color.green()
+        )
+        await interaction.response.edit_message(embed=embed, view=None)
+        self.decision = True
+        self.stop()
+
+    @nextcord.ui.button(label="Không đồng ý", style=nextcord.ButtonStyle.danger)
+    async def disagree(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message("Bạn không phải người yêu cầu.", ephemeral=True)
+
+        # Đặt cooldown 24 giờ vào templog
+        cooldown_until = int(time.time()) + 86400
+        async with self.bot.sessionmaker() as s:
+            user = await s.get(User, self.author.id)
+            if user:
+                # Cần đảm bảo templog là một dict
+                if not isinstance(user.templog, dict):
+                    user.templog = {}
+                user.templog['id_request_cooldown'] = cooldown_until
+                await s.commit()
+
+        embed = make_embed(
+            title="❌ Đã hủy yêu cầu",
+            desc=f"Bạn đã từ chối các điều khoản. Bạn có thể yêu cầu lại sau <t:{cooldown_until}:R>.",
+            color=nextcord.Color.red()
+        )
+        await interaction.response.edit_message(embed=embed, view=None)
+        self.decision = False
+        self.stop()
+
 class LevelSystemCog(commands.Cog):
     """📈 Hệ thống Level, XP, và Imini ID"""
 
@@ -27,7 +89,7 @@ class LevelSystemCog(commands.Cog):
         self.bot = bot
         self.last_msg_ts: dict[int, float] = {}
         self.voice_start: dict[int, float] = {}
-        self.temp_tokens: dict[int, dict] = {} # Nâng cấp: Lưu token tạm thời
+        self.temp_tokens: dict[int, dict] = {}
 
     async def _get_user(self, uid: int) -> User | None:
         async with self.bot.sessionmaker() as session:
@@ -99,33 +161,39 @@ class LevelSystemCog(commands.Cog):
     # --- Imini ID Commands ---
     @commands.command(name="requestid")
     async def cmd_requestid(self, ctx: commands.Context):
-        """🆔 Yêu cầu cấp Imini ID nếu bạn đủ điều kiện."""
         uid = ctx.author.id
-        async with self.bot.sessionmaker() as session:
-            user = await session.get(User, uid)
-            if not user:
-                return await ctx.send(embed=make_embed(desc="❌ Không tìm thấy hồ sơ của bạn.", color=nextcord.Color.red()))
-            if user.imini_id:
-                return await ctx.send(embed=make_embed(desc=f"✅ Bạn đã có Imini ID rồi: `{user.imini_id}`", color=nextcord.Color.blue()))
-            if user.level < 50:
-                return await ctx.send(embed=make_embed(desc="❌ Bạn cần đạt **Level 50** để có thể yêu cầu Imini ID.", color=nextcord.Color.red()))
+        user = await self._get_user(uid)
 
-            # Tạo ID duy nhất
-            while True:
-                new_id = f"IM-{random.randint(1000, 9999)}"
-                existing = await session.scalar(select(User.id).where(User.imini_id == new_id))
-                if not existing:
-                    break
-            
-            user.imini_id = new_id
-            await session.commit()
-            
-            embed = make_embed(title="✨ Chúc Mừng!", desc=f"Bạn đã nhận được Imini ID của mình: `{new_id}`", color=nextcord.Color.green())
-            await ctx.send(embed=embed)
+        if not user:
+            return await ctx.send(embed=make_embed(desc="❌ Không tìm thấy hồ sơ của bạn.", color=nextcord.Color.red()))
+        if user.imini_id:
+            return await ctx.send(embed=make_embed(desc=f"✅ Bạn đã có Imini ID rồi: `{user.imini_id}`", color=nextcord.Color.blue()))
+        if user.level < 50:
+            return await ctx.send(embed=make_embed(desc="❌ Bạn cần đạt **Level 50** để có thể yêu cầu Imini ID.", color=nextcord.Color.red()))
+        
+        cooldown = user.templog.get('id_request_cooldown', 0)
+        if time.time() < cooldown:
+            return await ctx.send(embed=make_embed(desc=f"⏳ Bạn đang trong thời gian chờ. Vui lòng thử lại sau <t:{int(cooldown)}:R>.", color=nextcord.Color.orange()))
+
+        rules_desc = (
+            "Chào mừng bạn đến với hệ thống Imini ID. Vui lòng đọc kỹ và đồng ý với các điều khoản sau:\n\n"
+            "**Luật 1:** Không mua bán, trao đổi ID số đẹp bằng tài khoản discord.\n"
+            "**Luật 2:** Không tạo tài khoản clone để kiếm thêm Imini ID.\n"
+            "**Luật 3:** Bạn phải chịu trách nhiệm bảo mật token nếu đã tạo, không được chia sẻ cho bất kỳ ai. Dev không bao giờ yêu cầu bạn cung cấp token.\n\n"
+            "*Lưu ý: Imini ID chỉ là ảo, không sử dụng cho mục đích ngoài đời thực.*"
+        )
+        embed = make_embed(title="📜 Điều khoản đăng ký Imini ID", desc=rules_desc, color=nextcord.Color.blurple())
+        view = IDAgreementView(self.bot, ctx.author)
+        
+        try:
+            await ctx.author.send(embed=embed, view=view)
+            await ctx.message.add_reaction("✅")
+            await ctx.send("Vui lòng kiểm tra tin nhắn riêng (DM) để hoàn tất đăng ký.", delete_after=10)
+        except nextcord.Forbidden:
+            await ctx.send("❌ Tôi không thể gửi tin nhắn riêng cho bạn. Vui lòng kiểm tra cài đặt quyền riêng tư.")
 
     @commands.command(name="myid")
     async def cmd_myid(self, ctx: commands.Context):
-        """🤫 Xem Imini ID của bạn (gửi qua tin nhắn riêng)."""
         user = await self._get_user(ctx.author.id)
         try:
             if user and user.imini_id:
@@ -138,22 +206,31 @@ class LevelSystemCog(commands.Cog):
 
     @commands.command(name="generatetoken")
     async def cmd_generatetoken(self, ctx: commands.Context):
-        """🔑 Tạo một token xác thực tạm thời (gửi qua tin nhắn riêng)."""
         uid = ctx.author.id
-        token = secrets.token_hex(16)
-        expires_at = time.time() + 300 # 5 phút
+        now = time.time()
+        
+        existing_token = self.temp_tokens.get(uid)
+        if existing_token:
+            if now < existing_token["expires_at"]:
+                await ctx.author.send("❌ Bạn đã có một token đang hoạt động. Vui lòng đợi nó hết hạn.")
+                await ctx.message.add_reaction("⚠️")
+                return
+            if now < existing_token["expires_at"] + 120: # 2 phút cooldown
+                wait_time = int(existing_token["expires_at"] + 120 - now)
+                await ctx.author.send(f"⏳ Vui lòng đợi **{wait_time} giây** nữa để tạo token mới.")
+                await ctx.message.add_reaction("⏳")
+                return
 
+        token = secrets.token_hex(16)
+        expires_at = now + 300 # 5 phút
         self.temp_tokens[uid] = {"token": token, "expires_at": expires_at}
         
         try:
-            await ctx.author.send(
-                f"🔑 Token tạm thời của bạn là:\n```\n{token}\n```\nNó sẽ hết hạn sau 5 phút."
-            )
+            await ctx.author.send(f"🔑 Token tạm thời của bạn là:\n```\n{token}\n```\nNó sẽ hết hạn sau 5 phút.")
             await ctx.message.add_reaction("✅")
         except nextcord.Forbidden:
             await ctx.send("❌ Tôi không thể gửi tin nhắn riêng cho bạn. Vui lòng kiểm tra cài đặt quyền riêng tư.")
-
-
+    
     # ... (setflex, unsetflex không đổi) ...
     @commands.command(name="setflex")
     async def set_flex(self, ctx: commands.Context, ach_key: str):
