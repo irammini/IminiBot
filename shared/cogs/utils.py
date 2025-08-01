@@ -77,7 +77,7 @@ class UtilsCog(commands.Cog):
         pages: list[nextcord.Embed] = []
 
         # --- Page 1: Command List (Mới) ---
-        e1 = make_embed(title="📖 IminiBot Help (v3.9)", color=nextcord.Color.teal())
+        e1 = make_embed(title="📖 IminiBot Help (v3.9.1)", color=nextcord.Color.teal())
         e1.description = "Chào mừng đến với bản cập nhật **The Custom Profile**!"
         e1.add_field(name="👤 Profile & Tùy chỉnh (MỚI!)", value="`!profile`, `!setaboutme`, `!setvibe`, `!setstatus`, `!setavatar`, `!setbanner`, `!setfield`, `!setcolor`, `!setframe`, `!setemoji`, `!settitle`, `!resetprofile`, `!previewcard`", inline=False)
         e1.add_field(name="🎭 Danh tính & Moods (MỚI!)", value="`!requestid`, `!myid`, `!generatetoken`, `!mood save/load/list/delete`", inline=False)
@@ -148,7 +148,7 @@ class UtilsCog(commands.Cog):
         """ℹ️ Hiển thị thông tin cơ bản về bot."""
         uptime = datetime.datetime.now(datetime.timezone.utc) - self.start_time
         embed = make_embed(title="ℹ️ IminiBot Info", color=nextcord.Color.dark_blue())
-        embed.add_field(name="📦 Version", value=self.bot.config.get("version", "3.9"), inline=True)
+        embed.add_field(name="📦 Version", value=self.bot.config.get("version", "3.9.1"), inline=True)
         embed.add_field(name="⏱️ Uptime", value=str(uptime).split('.')[0], inline=True)
         embed.add_field(name="🛠️ Owner", value="irammini", inline=True)
         embed.add_field(name="📚 Servers", value=str(len(self.bot.guilds)), inline=True)

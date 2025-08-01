@@ -13,25 +13,25 @@ class User(Base):
     __tablename__ = "users"
 
     # --- Core Identity ---
-    id = Column(BigInteger, primary_key=True)
-    imini_id = Column(String(10), nullable=True, unique=True) # ID người dùng duy nhất của IminiBot
+    id = Column(BigInteger, primary_key=True, index=True)
+    imini_id = Column(String(10), nullable=True, unique=True, index=True) # ID người dùng duy nhất của IminiBot
     created_at = Column(BigInteger, default=int(time.time()))
 
     # --- Leveling & Stats ---
-    xp = Column(BigInteger, default=0)
-    level = Column(BigInteger, nullable=False, default=1)
+    xp = Column(BigInteger, default=0, index=True)
+    level = Column(BigInteger, nullable=False, default=1, index=True)
     voice_time = Column(Float, default=0)
-    streak = Column(BigInteger, default=0)
+    streak = Column(BigInteger, default=0, index=True)
     last_daily = Column(Integer, default=0)
 
     # --- Economy ---
-    wallet = Column(DECIMAL(38, 0), default=0)
-    bank_balance = Column(BigInteger, default=0)
+    wallet = Column(DECIMAL(38, 0), default=0, index=True)
+    bank_balance = Column(BigInteger, default=0, index=True)
     bank_limit = Column(BigInteger, default=1_000_000_000)
     debt = Column(BigInteger, default=0)
 
     # --- Job System ---
-    job = Column(String, nullable=True)
+    job = Column(String, nullable=True, index=True)
     mastery = Column(BigInteger, default=0)
     job_tokens = Column(BigInteger, default=0)
     skills = Column(MutableDict.as_mutable(JSON), default=dict)
