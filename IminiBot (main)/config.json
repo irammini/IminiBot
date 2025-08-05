@@ -1,7 +1,7 @@
 {
-  "default_prefix": "i!",
+  "default_prefix": "!",
   "launch_date": "2024-04-18T00:00:00Z",
   "db_version": 2,
   "xp_formula": {"base":100, "power":2},
-  "admins_roles": ["Administrator","Moderator"]
+  "admins_roles": ["Administrator","Moderator"] 
 }

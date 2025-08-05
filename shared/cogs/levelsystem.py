@@ -18,7 +18,7 @@ from shared.models.user import User
 from shared.utils.embed import make_embed
 
 logger = logging.getLogger(__name__)
-LEVEL_UP_CHANNEL_ID = 0
+LEVEL_UP_CHANNEL_ID = 0 # Tùy chỉnh
 
 # --- View for ID Agreement ---
 class IDAgreementView(nextcord.ui.View):

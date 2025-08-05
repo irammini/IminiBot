@@ -22,7 +22,7 @@ from shared.utils.achievement import award
 logger = logging.getLogger(__name__)
 
 # Danh sách ID Dev / Owner bot
-DEV_IDS = [1064509322228412416, 1327287076122787940, 1204490429727244301]
+DEV_IDS = [] # Thêm danh sách ID vào đây, VD: 123456789, 987654321
 
 class AdminCog(commands.Cog, name="Admin"):
     """🔧 Các lệnh quản trị (Dev only): clear, reset, add coin,…"""
