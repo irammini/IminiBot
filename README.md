@@ -1,10 +1,10 @@
 # IminiBot
 
-IminiBot là một bot Discord đa tính năng thuộc dự án **Teaserverse**, được phát triển bởi `irammini` (Ngô Nhật Long). Đây là một dự án cá nhân, một sân chơi công nghệ để thử nghiệm các ý tưởng và công nghệ lập trình mới.
+IminiBot là một bot Discord đa tính năng thuộc dự án **Teaserverse**, được phát triển bởi `irammini`. Đây là một dự án cá nhân, một sân chơi công nghệ để thử nghiệm các ý tưởng và công nghệ lập trình mới.
 
 ## 🤖 Giới thiệu
 
-IminiBot là một bot thuộc thể loại "giải trí" với các tính năng đa dạng, tập trung vào tương tác và xây dựng một nền kinh tế ảo trong server Discord của bạn. Bot được xây dựng với mục tiêu học hỏi và sáng tạo, không có mục đích thương mại.
+IminiBot là một bot thuộc thể loại "giải trí" với các tính năng đa dạng, tập trung vào tương tác và xây dựng một nền kinh tế ảo trong server Discord của bạn. Bot được xây dựng với mục tiêu cho vui, không có mục đích thương mại.
 
 ## ✨ Các tính năng chính
 
@@ -109,20 +109,22 @@ Dựa trên một hệ thống cơ sở dữ liệu PostgreSQL mạnh mẽ, Imin
 
 ## 📂 Cấu trúc dự án
 
-Dưới đây là tổng quan về cấu trúc thư mục của dự án:
+Dưới đây là sơ lượt về cấu trúc thư mục của dự án:
 
 ```
 .
 ├── IminiBot (main)/    # Mã nguồn chính của bot
 │   ├── cogs/           # Các module (cogs) của bot
-│   ├── .env            # File cấu hình (bị ignore)
+│   ├── .env            # File cấu hình (bị ignore), bạn cần copy từ .env.example
 │   └── main.py         # Điểm khởi chạy bot
 ├── alembic/            # Các script migration của Alembic
 │   ├── versions/       # Các file phiên bản migration
 │   └── env.py          # Script cấu hình môi trường cho Alembic
 ├── shared/             # Các module chia sẻ
+│   ├── bot.py          # File khởi chạy bot chính
 │   ├── db.py           # Định nghĩa Base cho SQLAlchemy
-│   └── models/         # Các model của database
+│   ├── models/         # Các model của database
+│   └── folder khác     # Gồm cogs, data và các folder khác
 ├── .gitignore
 ├── alembic.ini         # File cấu hình của Alembic
 └── README.md
@@ -130,7 +132,11 @@ Dưới đây là tổng quan về cấu trúc thư mục của dự án:
 
 ## 🗺️ Lộ trình phát triển
 
-Phiên bản tiếp theo được mong đợi là **Huge Update 4.0: The Changed of The Era**, hứa hẹn sẽ mang đến những thay đổi lớn và "thời kỳ hoàng kim" cho IminiBot.
+Phiên bản tiếp theo được mong đợi là **Huge Update 4.0: The Changed of The Era**, hứa hẹn sẽ mang đến những thay đổi lớn và "thời kỳ hoàng kim" cho IminiBot. (hoặc không)
 
 ---
 *Thông tin trong README này được tổng hợp từ `Teaserverse_document.json`.*
+
+Website chính: **https://teaserverse.qzz.io/** *(đừng lo, sẽ có domain riêng sau, chắc vậy).*
+
+Các bot khác hiện chưa được public repo.
