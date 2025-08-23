@@ -56,7 +56,7 @@ Dựa trên một hệ thống cơ sở dữ liệu PostgreSQL mạnh mẽ, Imin
 
 1.  **Clone repository:**
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/irammini/IminiBot.git
     cd IminiBot
     ```
 
