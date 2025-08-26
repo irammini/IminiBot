@@ -140,3 +140,5 @@ Phiên bản tiếp theo được mong đợi là **Huge Update 4.0: The Changed
 Website chính: **https://teaserverse.qzz.io/** *(đừng lo, sẽ có domain riêng sau, chắc vậy).*
 
 Các bot khác hiện chưa được public repo.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I51KARDK)
